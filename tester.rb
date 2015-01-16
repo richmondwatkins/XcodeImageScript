@@ -79,25 +79,32 @@ result = Plist::parse_xml('scriptTest/ProjectSpecific/Data/project_settings.plis
 
 #Path to project_assets 'scriptTest/ProjectSpecific/Assets/project_specific.xcassets'
 assets_path = 'scriptTest/ProjectSpecific/Assets/project_specific.xcassets/'
+
 FileUtils.rm_rf(Dir.glob(assets_path))
+
 puts 'Drag icon folder into terminal'
 path_to_photos = gets
-directory = "photos/*"
+directory = "photos/**/*.png"
 
 directory = Dir[directory]
 
-#copy_string = 'cp ' + directory + ' ' + assets_path
-#puts copy_string
-#system(copy_string)
-#
 
 def createJsonfile(jsonImagesArray)
-    x = jsonImagesArray[0] ?  File.basename(jsonImagesArray[0]) : ""
-    xx = jsonImagesArray[1] ?  File.basename(jsonImagesArray[1]) : ""
-    xxx = jsonImagesArray[1] ?  File.basename(jsonImagesArray[2]) : ""
-    puts x
-    puts xx
-    puts xxx
+    puts jsonImagesArray
+    x = ""
+    xx = ""
+    xxx = ""
+
+    jsonImagesArray.each do |image|
+        if image.include? "@3x"
+            xxx = File.basename(image)
+        elsif image.include? "@2x"
+            xx = File.basename(image)
+        else
+            x = File.basename(image)
+        end
+    end
+
     content = '{
     "images" : [
     {
@@ -132,34 +139,9 @@ def createJsonfile(jsonImagesArray)
         target
 end
 
-def seperateJSON(file)
-    assetName = File.basename(file,'.*')
-    json = ""
-    if assetName.include? "@3x"
-        json =   '{
-                "idiom" : "universal",
-                "scale" : "3x",
-                "filename" : "'"#{ assetName }.png"'"
-                }'
-    elsif assetName.include? "@2x"
-            json =   '{
-                        "idiom" : "universal",
-                        "scale" : "2x",
-                        "filename" : "'"#{ assetName }.png"'"
-                    }'
-    else
-            json =   '{
-                "idiom" : "universal",
-                "scale" : "1x",
-                "filename" : "'"#{ assetName }.png"'"
-                }'
-
-    end
-
-    json.to_json
-end
 
 createdDirectories = [];
+
 directory.each do |file|
     assetName = File.basename(file,'.*')
 
@@ -186,14 +168,6 @@ directory.each do |file|
     end
 
     FileUtils.cp("#{file}", "#{imageSetName}")
-
-#    FileUtils.cp("#{json}", "#{imageSetName}")
-
-#    copy_string = 'mv ' + imageSetName + ' ' + assets_path
-#    system(copy_string)
-
-#    FileUtils.rm_rf(imageSetName)
-#    FileUtils.mv file, assets_path
 end
 
 
@@ -208,16 +182,10 @@ createdDirectories.each do |dir|
     jsonFile = createJsonfile(jsonImagesArray)
 
     FileUtils.mv("#{jsonFile}", "#{dir}")
-    puts '===='
-    puts Dir.pwd
-    puts assets_path
-    puts '======'
-    puts "#{dir}"
     FileUtils.mv("#{dir}", "#{assets_path}")
 
 end
 
-#iPhoneNavItems
 
 
 #PhoneNavItems"=>[{"Class"=>"FAMapTabViewController", "IconName"=>"map_menu_ic", "Title"=>"Map"}, {"Class"=>"FALineupTabVC", "IconName"=>"menu_lineup_ic", "Title"=>"My Scheudle & Lineup"}, {"Class"=>"FAWhatsHotVC", "IconName"=>"menu_heart_btn", "Title"=>"Firefly Favorites"}, {"Class"=>"FAPoiTabViewController", "IconName"=>"menu_eatdrink_ic", "Title"=>"Festival Experience"}, {"IconName"=>"menu_social_ic", "Title"=>"News & Social", "Class"=>"FANewsTabVC"}, {"Class"=>"FaqVC", "IconName"=>"menu_question_btn", "Title"=>"Pre-Festival Guide"}, {"URL"=>"http://aloo.mp/fireflywristbands", "IconName"=>"menu_wristband_ic", "Title"=>"Wristband Activation"}, {"Class"=>"FARadioPlayerViewController", "IconName"=>"menu_radio_btn", "Title"=>"Firefly Radio"}]}
